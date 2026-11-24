@@ -1,0 +1,23 @@
+services:
+  vpn-client:
+    build: .
+    container_name: vpn-client
+    environment:
+      VLESS_URL: ${VLESS_URL:-}
+      SUBSCRIPTION_URL: ${SUBSCRIPTION_URL:-}
+      SUBSCRIPTION_SERVER: ${SUBSCRIPTION_SERVER:-}
+    networks:
+      - vpn-network
+    expose:
+      - "1080"
+    healthcheck:
+      test: ["CMD", "curl", "--silent", "--show-error", "--fail", "--noproxy", "", "--proxy", "http://127.0.0.1:1080", "--max-time", "8", "--output", "/dev/null", "https://api.telegram.org/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+networks:
+  vpn-network:
+    external: true
